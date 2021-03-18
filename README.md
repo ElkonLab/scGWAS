@@ -1,4 +1,5 @@
-Example for trait-trajectory analysis
+Genetic mapping of developmental trajectories for complex traits and
+diseases
 ================
 
 This repository contains scripts, explanations and examples for or
