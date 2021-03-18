@@ -36,14 +36,14 @@ al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1). The following are
 links to each vignette:
 
   - **Task 1**: Identification of connections between developmental
-    trajectories and traits vignette:
-    [link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+    trajectories and traits - [vignette
+    link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
   - **Task 2**: Elucidate molecular pathways that underlie the link
-    between the trajectory and trait vignette:
-    [link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+    between the trajectory and trait - [vignette
+    link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
   - **Task 3**: Prioritize genes that carry the link between the
-    pathway, trait and trajectory vignette:
-    [link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+    pathway, trait and trajectory - [vignette
+    link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
 
 ## Authors
 
