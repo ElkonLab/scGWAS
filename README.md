@@ -64,7 +64,7 @@ details the analysis steps and provides links to the vignette:
     
       - **1d. Examining the association between trait and trajectory.**
         See our
-        [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md).
+        [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/1d.md).
   - **Step 2: Elucidate molecular pathways that underlie the link
     between the trajectory and trait.** This includes first (**2a**)
     finding pathways enriched in the trajectory, and then (**2b**)
