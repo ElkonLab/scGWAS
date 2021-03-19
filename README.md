@@ -73,7 +73,7 @@ details the analysis steps and provides links to the vignette:
     here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
 
 The following flowchart summarizes the analysis steps:
-![](https://github.com/eldadshulman/scGWAS/blob/master/data/pic/flow.PNG)
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/flow.PNG)
 
 ## Authors
 
