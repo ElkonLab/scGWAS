@@ -36,9 +36,9 @@ al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1). The following
 details the analysis steps and provides links to the vignette:
 
   - **Step 1: Identification of connections between developmental
-    trajectories and traits**
+    trajectories and traits.** This involves the following:
       - **1a. Converting GWAS variant scores into gene-trait association
-        scores.** This step is performed using MAGMA gene analysis. We
+        scores.** This is performed using MAGMA gene analysis. We
         provide example output
         [files](https://github.com/ElkonLab/scGWAS/tree/master/data/magma_outputs)
         for the type 2 diabetes dataset. Refer to MAGMA’s
@@ -65,12 +65,12 @@ details the analysis steps and provides links to the vignette:
       - **1d. Examining the association between trait and trajectory.**
         See our
         [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md).
-  - **Step 2**: Elucidate molecular pathways that underlie the link
-    between the trajectory and trait - [vignette
-    link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
-  - **Step 3**: Prioritize genes that carry the link between the
-    pathway, trait and trajectory - [vignette
-    link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+  - **Step 2: Elucidate molecular pathways that underlie the link
+    between the trajectory and trait.** See our [vignette
+    here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+  - **Step 3: Prioritize genes that carry the link between the pathway,
+    trait and trajectory.** See our [vignette
+    here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
 
 ## Authors
 
