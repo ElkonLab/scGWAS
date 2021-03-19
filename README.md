@@ -66,14 +66,17 @@ details the analysis steps and provides links to the vignette:
         See our
         [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md).
   - **Step 2: Elucidate molecular pathways that underlie the link
-    between the trajectory and trait.** See our [vignette
-    here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
+    between the trajectory and trait.** This includes first (**2a**)
+    finding pathways enriched in the trajectory, and then (**2b**)
+    exmining if they are enriched for the trait. Both steps are covered
+    by the following
+    [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
   - **Step 3: Prioritize genes that carry the link between the pathway,
     trait and trajectory.** See our [vignette
     here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
 
 The following flowchart summarizes the analysis steps:
-![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/flow.PNG)
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/flow.tif)
 
 ## Authors
 
