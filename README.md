@@ -72,7 +72,9 @@ details the analysis steps and provides links to the vignette:
     trait and trajectory.** See our [vignette
     here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/first_step.md)
 
-## Authors
+The following flowchart summarizes the analysis steps:
+![](https://github.com/eldadshulman/scGWAS/blob/master/data/pic/flow.PNG)
+\#\# Authors
 
   - Eldad David Shulman
 
