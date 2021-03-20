@@ -69,7 +69,7 @@ details the analysis steps and provides links to the vignette:
         [here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/2a.md).
     -   **2b.** examining if they are enriched for the trait. This is
         covered
-        [here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/2a.md).
+        [here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/2b.md).
 -   **Step 3: Prioritize genes that carry the link between the pathway,
     trait and trajectory.** See our [vignette
     here](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/2a.md).
