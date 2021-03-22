@@ -46,7 +46,7 @@ details the analysis steps and provides links to the vignettes:
         [manual](https://ctg.cncr.nl/software/MAGMA/doc/manual_v1.07.pdf)
         for a detailed explanation.
     -   **1b.** *Calculating cell-trait association scores.* See our
-        [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/1b.md)
+        [vignette](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/1b.md).
     -   **1c.** *Trajectory inference.* This step is performed using
         tools such as Monocle 2, Monocle 3, destiny. In principle, any
         tool that gives quantitative maturation scores for cells, e.g.,
