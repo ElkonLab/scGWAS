@@ -32,7 +32,9 @@ We provide vignettes for the analysis using scRNA-seq dataset of
 pancreatic islet development [(Byrnes et
 al.)](https://doi.org/10.1038/s41467-018-06176-3), and a GWAS dataset of
 type 2 diabetes [(Mahajan et
-al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1). The following
+al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1). See the following
+[link](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/all.html)
+for a vignette that covers all the steps. Alternatively, the following
 details the analysis steps and provides links to the vignettes:
 
 -   **Step 1: Identification of connections between developmental
