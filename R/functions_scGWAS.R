@@ -63,3 +63,44 @@ get_scores <- function(gsa.files.path, cors = 20){
   
 ###### 
 
+
+df.genes <- function(exp = exp, meta = meta, model, branch = NULL, cors = 10){
+  
+  if(!is.null(branch)){
+    ref <- levels(meta$branch)[levels(meta$branch) != branch]
+    meta$branch <- relevel(meta$branch, ref = "")
+  }
+  
+  var <- gsub(model, pattern = "~", replacement = "")
+  var <- gsub(var, pattern = ":", replacement = " ")
+  var <- gsub(var, pattern = "[+]", replacement = " ")
+  var <- gsub(var, pattern = "  ", replacement = " ")
+  var <- gsub(var, pattern = "  ", replacement = " ")
+  var <- strsplit(var, split = " ")[[1]]
+  var <- c("cells", var)
+  met <- meta[,which(colnames(meta) %in% var)]
+  
+  model <- paste0("exp ", model)    
+  model <- as.formula(model)
+  df.gene <- function(genename, .exp = exp, .meta = met, .model = model){
+    exp.gene <- exp[genename,]
+    exp.gene <- data.frame(cells = names(exp.gene), exp = as.numeric(exp.gene))
+    exp.gene <- merge(exp.gene, met, by = "cells")
+    exp.gene <- es[complete.cases(exp.gene),]
+    full_model_fit <- speedglm::speedglm(data = exp.gene , formula = model, 
+                                         family = stats::gaussian(), acc = 0.001, model = FALSE, 
+                                         y = FALSE)
+    
+    s <- summary(full_model_fit)
+    df <- s$coefficients[4,]
+    df$gene <- genename
+    df <- df[,c(5,1:4)]
+    colnames(df)[4] <- "t"
+    df
+    
+  }
+  
+  plyr::rbind.fill(mclapply(FUN = df_branch, X = rownames(exp), mc.cores = 10, mc.preschedule = T))
+  
+}
+

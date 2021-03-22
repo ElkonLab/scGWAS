@@ -19,9 +19,9 @@ Genome-Wide Association Studies (GWAS) and single-cell RNA-seq
 
 -   [MAGMA](https://ctg.cncr.nl/software/magma)
 -   Download our R functions
-    [here](https://github.com/ElkonLab/scGWAS/blob/master/R/functions_scGWAS.R)
+    [here](https://github.com/ElkonLab/scGWAS/blob/master/R/functions_scGWAS.R).
 -   Make sure the following packages are Installed: Monocole (v2), plyr,
-    ggplot2, data.table, parallel, Seurat, clusterProfiler (a
+    ggplot2, data.table, parallel, speedglm, Seurat, clusterProfiler (a
     Bioconductor package).
 -   Some input files are also required. For details and sample files,
     see individual vignettes bellow.
