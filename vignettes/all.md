@@ -292,15 +292,187 @@ head(pan.t2d, 3)
 We can plot the trajectory, coloring the cells according to pseudotime:
 
 ``` r
- p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
-                                 color =  Pseudotime))  +
-    geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
-    ggpubr::theme_pubr()  +
-    scale_color_continuous(high = "#132B43", low = "#56B1F7") 
+p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                  color =  Pseudotime))  +
+  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+  ggpubr::theme_pubr()  +
+  scale_color_continuous(high = "#132B43", low = "#56B1F7") 
 print(p)
 ```
 
 ![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/pseudotime.png)
+
+And, coloring the cells according to T2D risk scores.
+
+``` r
+p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                  color =  cs))  +
+  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+  ggpubr::theme_pubr()  +
+  scale_color_gradient2(low ="#4575B4", mid = "#91BFDB",
+                        high = "#D73027", name = "T2D Risk Score")
+print(p)
+```
+
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/risk.png)
+
+#### Analysis without branches
+
+Now we can perform the regression analysis: cell scores \~ pseudotime.
+
+``` r
+mod <- lm(data = pan.t2d, formula = cs ~ Pseudotime)
+res <- summary(mod)
+print(res$coefficients)
+```
+
+    ##                Estimate  Std. Error   t value     Pr(>|t|)
+    ## (Intercept) -0.39567031 0.055645311 -7.110578 1.471984e-12
+    ## Pseudotime   0.04059159 0.004270521  9.505067 4.243757e-21
+
+To get the p-value, we will us the single-sided test pseudotime
+coefficients &gt; 0.
+
+``` r
+pv <- pt(coef(res)[, 3], mod$df, lower = FALSE)[2]
+print(paste("p-value = ", signif(pv, 2)))
+```
+
+    ## [1] "p-value =  2.1e-21"
+
+-   We can visualize the result with a scatter plot:
+
+``` r
+p <- ggplot2::ggplot(pan.t2d,ggplot2::aes(x = Pseudotime, y = cs)) + ggplot2::geom_point() + 
+  ggpubr::theme_pubr() + ggplot2::ylab("T2D Risk") + ggplot2::xlab("Pseudotime") + 
+  ggplot2::coord_fixed(ratio=4) + ggplot2::geom_smooth(method='lm')
+print(p)
+```
+
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/scatterplot.PNG)
+
+#### Branch Analysis
+
+First, we need to assign branch identity to each cell. For this, we
+follow monocle and use the “State” variable.
+
+``` r
+p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                  color =  State))  +
+  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+  ggpubr::theme_pubr()
+print(p)
+```
+
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/states.png)
+
+Here, we know that state 1 are the unbranched progenitors. The
+beta-branch is state 5, and 2,3,4 are the aplha branch. We divide the
+unbranched progenitors into branches by ordering them according to
+pseudotime, and assigning odd and even ranked cells to the first and
+second branches, respectively. We assigne the first progenitor to both
+branches. This is achieved by the following:
+
+``` r
+pan.t2d <- branch_assign(pan.t2d, progenitors = 1, branch1 = c(2,3,4), 
+                         branch2 = 5, b.names = c("Alpha", "Beta"))
+
+head(pan.t2d)
+```
+
+    ##              cells          cs nGene  nUMI orig.ident percent.mito res.0.8
+    ## 1 ACACTGAAGAATGTTG  0.55804175  3375 10687    Fev_E14   0.02358226      10
+    ## 2 ACACTGAAGAATGTTG  0.55804175  3375 10687    Fev_E14   0.02358226      10
+    ## 3 CCATTCGTCGTTGCCT -1.12164422  4215 15785    Fev_E14   0.03376623       8
+    ## 4 CGAATGTCAGCAGTTT  0.36772213  3807 13108    Fev_E14   0.03135729      10
+    ## 5 CATCAGAAGAGGACGG  0.36563265  3257  9750    Fev_E14   0.02810256      10
+    ## 6 CGAACATAGCTTATCG  0.09042509  3726 12361    Fev_E14   0.01860691      10
+    ##   res.1.4 Size_Factor Pseudotime State      dim1      dim2 rank  cell.type
+    ## 1      12    1.419491 0.00000000     1 -9.781157 -3.676372    0 Progenitor
+    ## 2      12    1.419491 0.00000000     1 -9.781157 -3.676372    1 Progenitor
+    ## 3       7    2.096824 0.02374406     1 -9.879779 -3.464093    2 Progenitor
+    ## 4      12    1.741088 0.12551330     1 -9.723341 -3.528040    3 Progenitor
+    ## 5      12    1.295156 0.16231976     1 -9.631442 -3.610558    4 Progenitor
+    ## 6      12    1.641992 0.33112614     1 -9.527802 -3.454580    5 Progenitor
+    ##   Branch
+    ## 1  Alpha
+    ## 2   Beta
+    ## 3  Alpha
+    ## 4   Beta
+    ## 5  Alpha
+    ## 6   Beta
+
+To examine if the D2T risk association is branch-dependent, we compare
+the goodness following models:
+
+``` r
+# Null model, assumes that there is no branch-dependency:   
+mod0 <- lm(data = pan.t2d, formula = cs ~ Pseudotime)
+# model that assumes branch-dependency: 
+mod1 <- lm(data = pan.t2d, formula = cs ~ Pseudotime:Branch + Pseudotime)
+```
+
+We use Likelihood ratio test to compare the models:
+
+``` r
+lkrt <- lmtest::lrtest(mod1, mod0)
+pv <- paste0("p-value = ", signif(lkrt$`Pr(>Chisq)`[2],2))
+cat(pv)
+```
+
+    ## p-value = 5e-21
+
+To examine if there is a positive correlation between T2D
+risk-association scores and pseudotime within each branch, we use the
+following model.
+
+``` r
+mod <- lm(data = pan.t2d, formula = cs ~ Pseudotime:Branch)
+res <- summary(mod)
+# For one-sided test p-value:
+pvs <- pt(coef(res)[, 3], mod$df, lower = FALSE)
+
+
+pv <- paste0("Alpha: p-value = ", signif(pvs[2],2),
+             "\nBeta: p-value = ", signif(pvs[3],2))
+cat(pv)
+```
+
+    ## Alpha: p-value = 1.2e-19
+    ## Beta: p-value = 7.1e-40
+
+-   We can visualize the result with a scatter plot:
+
+``` r
+# For reggression lines:
+pre <- data.frame(Pseudotime = pan.t2d$Pseudotime)
+pre$Branch <- levels(pan.t2d$Branch)[1]
+
+pre2 <- data.frame(Pseudotime = pan.t2d$Pseudotime)
+pre2$Branch = levels(pan.t2d$Branch)[2]
+
+pan.t2d$line1 <- predict(mod1, pre)
+pan.t2d$line2 <- predict(mod1, pre2)
+p <- ggplot2::ggplot(pan.t2d,ggplot2::aes(x = Pseudotime, y = cs, 
+                                          color = cell.type)) + 
+  ggplot2::geom_point() + ggpubr::theme_pubr() + 
+  ggplot2::ylab("T2D Risk") + ggplot2::xlab("Pseudotime") + 
+  scale_color_manual(values = c( "grey", "#72ECFA", "#FA8072")) +
+  geom_line(aes(Pseudotime ,line1), color = "#08cbe2",
+            size =2, show.legend = F) +
+  geom_line(aes(Pseudotime,line2), color = "#FA8072", 
+            size =2, show.legend = F) +
+  ggplot2::coord_fixed(ratio=4)
+print(p)
+```
+
+![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/scatterplot_branch.png)
+We save the object pan.t2d for the next step.
+
+``` r
+saveRDS(object = pan.t2d, 
+        file = "meta.pancreas.RDS")
+```
 
 # Step 2: Elucidate molecular pathways that underlie the link between the trajectory and trait
 
