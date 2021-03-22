@@ -100,7 +100,37 @@ df.genes <- function(exp = exp, meta = meta, model, branch = NULL, cors = 10){
     
   }
   
-  plyr::rbind.fill(mclapply(FUN = df_branch, X = rownames(exp), mc.cores = 10, mc.preschedule = T))
+  plyr::rbind.fill(mclapply(FUN = df_branch, X = rownames(exp), 
+                            mc.cores = 10, mc.preschedule = T))
   
 }
 
+
+##########
+
+
+branch_assign <- function(traj, progenitors, branch1, branch2, b.names){
+  traj <- dplyr::arrange(traj, Pseudotime) %>% 
+    dplyr::mutate(rank = 1:nrow(traj))
+  traj <- rbind.data.frame(traj[1,], traj)
+  traj$rank[1] <- 0
+  traj$cell.type <- ifelse(traj$State %in% progenitors, "Progenitor",
+                           b.names[1])
+  traj$cell.type <- ifelse(traj$State %in% branch2, b.names[2], 
+                           traj$cell.type)
+  
+  traj$Branch <- traj$cell.type
+  traj$Branch <- ifelse(test = ((traj$cell.type ==  "Progenitor") & 
+                                  (traj$rank%%2 == 0)),
+                        yes = b.names[1], no = traj$Branch)
+  traj$Branch <- ifelse(test = (traj$cell.type ==  "Progenitor") & 
+                          (traj$rank%%2 != 0), 
+                        yes = b.names[2], 
+                        no =  traj$Branch)
+  traj$Branch <- factor(traj$Branch, levels = c(b.names[1],
+                                                b.names[2]))
+  traj$cell.type <- factor(traj$cell.type, levels = c("Progenitor", 
+                                                      b.names[1],
+                                                      b.names[2]))
+  traj
+}
