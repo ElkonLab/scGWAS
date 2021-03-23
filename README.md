@@ -24,7 +24,7 @@ Genome-Wide Association Studies (GWAS) and single-cell RNA-seq
     ggplot2, data.table, parallel, speedglm, Seurat, clusterProfiler (a
     Bioconductor package).
 -   Some input files are also required. For details and sample files,
-    see individual vignettes bellow.
+    see individual vignettes below.
 
 ## Examples for usage
 
