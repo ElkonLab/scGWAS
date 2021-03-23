@@ -44,6 +44,7 @@ type 2 diabetes [(Mahajan et
 al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1).
 
 The following flowchart summarizes the analysis steps:
+
 ![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/flow.PNG)
 
 # Step 1: Identification of connections between developmental trajectories and traits
