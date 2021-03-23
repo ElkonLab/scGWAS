@@ -1,7 +1,7 @@
 Genetic mapping of developmental trajectories for complex traits and
 diseases - vignette
 ================
-Eldad David Shulman
+Eldad David Shulman & Ran Elkon
 
 -   [Step 1: Identification of connections between developmental
     trajectories and
@@ -24,8 +24,21 @@ Eldad David Shulman
     trait and
     trajectory](#step-3-prioritize-genes-that-carry-the-link-between-the-pathway-trait-and-trajectory)
 
-We provide vignettes for the analysis using scRNA-seq dataset of
-pancreatic islet development [(Byrnes et
+This vignette contains scripts, explanations, and examples for our
+pipeline for genetic mapping of developmental trajectories for complex
+traits and diseases. The pipeline is based on integrative analysis of
+Genome-Wide Association Studies (GWAS) and single-cell RNA-seq
+(scRNA-seq). The analysis performs the following three main tasks:
+
+1.  Identification of connections between developmental trajectories and
+    traits.
+2.  Elucidate molecular pathways that underlie the link between the
+    trajectory and trait
+3.  Prioritize genes that carry the link between the pathway, trait and
+    trajectory
+
+For the example here we use scRNA-seq dataset of pancreatic islet
+development [(Byrnes et
 al.)](https://doi.org/10.1038/s41467-018-06176-3), and a GWAS dataset of
 type 2 diabetes [(Mahajan et
 al.)](https://dx.doi.org/10.1038%2Fs41588-018-0084-1). The following
@@ -41,7 +54,18 @@ This is performed using MAGMA gene analysis. We provide example output
 for the type 2 diabetes dataset. Refer to MAGMA’s
 [website](https://ctg.cncr.nl/software/magma) and
 [manual](https://ctg.cncr.nl/software/MAGMA/doc/manual_v1.07.pdf) for a
-detailed explanation.
+detailed explanation. The command used is:
+
+    magma --bfile g1000.eur --pval summary.stat.file  use=rs_id,pval ncol=sample_size  --gene-annot gene.loc.g1000.eur.genes.annot  --out T2D_European.BMIadjusted
+
+Where the *–pval* is the path to the GWAS summary statistics. The
+*–gene-annot* is the gene annotation file. See
+[manual](https://ctg.cncr.nl/software/MAGMA/doc/manual_v1.07.pdf) for
+instructions. We use an annotation window of 10-kbp around the gene. The
+*–bfile* gets a path to the file that specifies reference data used to
+estimate LD between SNPs. We processed this file using the European
+population VCF files from the [1000 Genome
+project](https://www.internationalgenome.org/).
 
 ## 1b. Calculating cell-trait association scores
 
