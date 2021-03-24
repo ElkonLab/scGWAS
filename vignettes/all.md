@@ -49,6 +49,11 @@ The following flowchart summarizes the analysis steps:
 
 # Step 1: Identification of connections between developmental trajectories and traits
 
+This step is for the identification of connections between developmental
+trajectories and traits. For this example, we assess the association
+between the trajectory of pancreas development and the trait of risk for
+type 2 diabetes (T2D).
+
 ## 1a. Converting GWAS variant scores into gene-trait association scores
 
 This is performed using MAGMA gene analysis. We provide example output
@@ -61,15 +66,17 @@ detailed explanation. The command used is:
     magma --bfile g1000.eur --pval summary.stat.file  use=rs_id,pval ncol=sample_size  --gene-annot gene.loc.g1000.eur.genes.annot  --out T2D_European.BMIadjusted
 
 Where the *–pval* is the path to the GWAS summary statistics. The
-*–gene-annot* is the gene annotation file. See
-[manual](https://ctg.cncr.nl/software/MAGMA/doc/manual_v1.07.pdf) for
-instructions. We use an annotation window of 10-kbp around the gene. The
 *–bfile* gets a path to the file that specifies reference data used to
 estimate LD between SNPs. We processed this file using the European
 population VCF files from the [1000 Genome
-project](https://www.internationalgenome.org/).
+project](https://www.internationalgenome.org/). The *–gene-annot* is the
+gene annotation file (See [MAGMA’s
+manual](https://ctg.cncr.nl/software/MAGMA/doc/manual_v1.07.pdf) for
+instructions). We use an annotation window of 10-kbp around the gene.
 
 ## 1b. Calculating cell-trait association scores
+
+### Load packages
 
 Load the following required packages:
 
@@ -81,7 +88,7 @@ library(data.table)
 
 ### Preprocessing
 
-We will use extract the count matrix from the monocle object. Fir, Load
+We will use extract the count matrix from the Monocle object. We load
 the object:
 
 ``` r
@@ -131,16 +138,16 @@ exp <- exp[,-2]
 exp <- exp[!duplicated(exp$GENE),]
 ```
 
-#### Calculating cell-trait association scores
+### Calculating cell-trait association scores
 
 This part involves running MAGMA’s gene property analysis for each cell
 separately. This might take long, so consider using multiple cores.
 First, we generate ‘covariate files’ for MAGMA for each cell. Each
-output file is a table with the columns: gene, normalized expression in
-the cell, and average normalized expression in the dataset. The function
-takes as input the data.frame of the normalized expression matrix. The
-user specifies the name of the output directory (out.dir) and the number
-of cores (cor).
+output file is a table with the columns: gene names, genes normalized
+expression in the cell, and genes average normalized expression in the
+dataset. The function takes as input the data.frame of the normalized
+expression matrix. The user specifies the name of the output directory
+(out.dir) and the number of cores (cor).
 
 ``` r
 generate_covs_cells(exp = exp, out.dir = "cov_panc",cors = 20)
@@ -151,15 +158,17 @@ This analysis firs the following the regression model to each cell:
 
 ![](https://github.com/eldadshulman/scGWAS/blob/master/data/pic/eq.PNG)
 
-where Z is the vector of the gene’s Z-score converted from the p-values
-obtained from MAGMA’s gene analysis for the trait. B is a matrix of
-technical confounders, including gene length and SNPs’ LDs, calculated
-by MAGMA. C is the vector of normalized expression of the genes in the
-cell, and A is a vector of the average normalized expression for the
-gene in the dataset. The t-statistic of *β*<sub>*c*</sub> is taken as
-the score for the association between the cell and trait.
+where *Z* is the vector of the gene’s Z-score converted from the
+p-values obtained from MAGMA’s gene analysis for the trait. *B* is a
+matrix of technical confounders, including gene length and SNPs’ LDs,
+calculated by MAGMA. *C* is the vector of normalized expression of the
+genes in the cell, and *A* is a vector of the average normalized
+expression for the gene in the dataset. The t-statistic of
+*β*<sub>*c*</sub> is taken as the score for the association between the
+cell and trait.
 
-This function will run the regression for each cell. The input is:
+The function *gene\_prop\_cells* will run the regression for each cell.
+The input is:
 
 -   magma.path - The path to magma directory
     (“/path/to/MAGMA\_directory/”)
@@ -183,8 +192,9 @@ gene_prop_cells(cor = 30, raw.file.path = "T2D_European.BMIadjusted.genes.raw",
                 covariate.files.dir.path = "cov_panc", out.dir = "T2D", magma.path = ".")
 ```
 
-Last, extract the cell scores from MAGMA’s output, namely the
-t-statistics.
+Last, we use *get\_scores* to extract the cell scores from MAGMA’s
+output, namely the t-statistics. *gsa.files.path* gets the path to the
+output files of the previews step.
 
 ``` r
 cs.pan.t2d <- get_scores(gsa.files.path = "T2D", cors = 20)
@@ -228,7 +238,7 @@ Also, the output, Monocle object, is available
 In this step, we will examine the association between trait scores and
 pseudotimes of cells.
 
-#### Load the data
+### Load the data
 
 Load the following required packages:
 
@@ -318,11 +328,11 @@ head(pan.t2d, 3)
 We can plot the trajectory, coloring the cells according to pseudotime:
 
 ``` r
-p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
-                                  color =  Pseudotime))  +
-  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
-  ggpubr::theme_pubr()  +
-  scale_color_continuous(high = "#132B43", low = "#56B1F7") 
+ p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                 color =  Pseudotime))  +
+    geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+    ggpubr::theme_pubr()  +
+    scale_color_continuous(high = "#132B43", low = "#56B1F7") 
 print(p)
 ```
 
@@ -331,18 +341,18 @@ print(p)
 And, coloring the cells according to T2D risk scores.
 
 ``` r
-p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
-                                  color =  cs))  +
-  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
-  ggpubr::theme_pubr()  +
-  scale_color_gradient2(low ="#4575B4", mid = "#91BFDB",
-                        high = "#D73027", name = "T2D Risk Score")
+ p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                 color =  cs))  +
+    geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+    ggpubr::theme_pubr()  +
+     scale_color_gradient2(low ="#4575B4", mid = "#91BFDB",
+                          high = "#D73027", name = "T2D Risk Score")
 print(p)
 ```
 
 ![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/risk.png)
 
-#### Analysis without branches
+### Analysis without branches
 
 Now we can perform the regression analysis: cell scores \~ pseudotime.
 
@@ -356,8 +366,8 @@ print(res$coefficients)
     ## (Intercept) -0.39567031 0.055645311 -7.110578 1.471984e-12
     ## Pseudotime   0.04059159 0.004270521  9.505067 4.243757e-21
 
-To get the p-value, we will us the single-sided test pseudotime
-coefficients &gt; 0.
+To get the p-value, we use the single-sided test pseudotime coefficients
+&gt; 0.
 
 ``` r
 pv <- pt(coef(res)[, 3], mod$df, lower = FALSE)[2]
@@ -377,27 +387,28 @@ print(p)
 
 ![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/scatterplot.PNG)
 
-#### Branch Analysis
+### Branch Analysis
 
 First, we need to assign branch identity to each cell. For this, we
 follow monocle and use the “State” variable.
 
 ``` r
-p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
-                                  color =  State))  +
-  geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
-  ggpubr::theme_pubr()
+ p <- ggplot(pan.t2d, ggplot2::aes(y = dim2 , x = dim1,
+                                 color =  State))  +
+    geom_point(size=1) + xlab("Component 1") + ylab("Component 2") +
+    ggpubr::theme_pubr()
 print(p)
 ```
 
 ![](https://github.com/ElkonLab/scGWAS/blob/master/data/pic/states.png)
 
-Here, we know that state 1 are the unbranched progenitors. The
-beta-branch is state 5, and 2,3,4 are the aplha branch. We divide the
-unbranched progenitors into branches by ordering them according to
-pseudotime, and assigning odd and even ranked cells to the first and
-second branches, respectively. We assigne the first progenitor to both
-branches. This is achieved by the following:
+Here, we know that state 1 are the unbranched progenitors. State 5
+corresponds to the beta-branch, and 2,3,4 correspond to the
+alpha-branch. We divide the unbranched progenitors into branches by
+ordering them according to pseudotime, and assigning odd and even ranked
+cells to the first and second branches, respectively. We assigne the
+first progenitor to both branches. This is achieved by the use of
+*branch\_assign* function, as follows:
 
 ``` r
 pan.t2d <- branch_assign(pan.t2d, progenitors = 1, branch1 = c(2,3,4), 
@@ -441,9 +452,9 @@ mod1 <- lm(data = pan.t2d, formula = cs ~ Pseudotime:Branch + Pseudotime)
 We use Likelihood ratio test to compare the models:
 
 ``` r
-lkrt <- lmtest::lrtest(mod1, mod0)
-pv <- paste0("p-value = ", signif(lkrt$`Pr(>Chisq)`[2],2))
-cat(pv)
+    lkrt <- lmtest::lrtest(mod1, mod0)
+    pv <- paste0("p-value = ", signif(lkrt$`Pr(>Chisq)`[2],2))
+    cat(pv)
 ```
 
     ## p-value = 5e-21
@@ -459,26 +470,26 @@ res <- summary(mod)
 pvs <- pt(coef(res)[, 3], mod$df, lower = FALSE)
 
 
-pv <- paste0("Alpha: p-value = ", signif(pvs[2],2),
-             "\nBeta: p-value = ", signif(pvs[3],2))
+pv <- paste0("Alpha-branch: p-value = ", signif(pvs[2],2),
+             "\nBeta-branch: p-value = ", signif(pvs[3],2))
 cat(pv)
 ```
 
-    ## Alpha: p-value = 1.2e-19
-    ## Beta: p-value = 7.1e-40
+    ## Alpha-branch: p-value = 1.2e-19
+    ## Beta-branch: p-value = 7.1e-40
 
 -   We can visualize the result with a scatter plot:
 
 ``` r
 # For reggression lines:
 pre <- data.frame(Pseudotime = pan.t2d$Pseudotime)
-pre$Branch <- levels(pan.t2d$Branch)[1]
-
-pre2 <- data.frame(Pseudotime = pan.t2d$Pseudotime)
-pre2$Branch = levels(pan.t2d$Branch)[2]
-
-pan.t2d$line1 <- predict(mod1, pre)
-pan.t2d$line2 <- predict(mod1, pre2)
+  pre$Branch <- levels(pan.t2d$Branch)[1]
+  
+  pre2 <- data.frame(Pseudotime = pan.t2d$Pseudotime)
+  pre2$Branch = levels(pan.t2d$Branch)[2]
+  
+  pan.t2d$line1 <- predict(mod1, pre)
+  pan.t2d$line2 <- predict(mod1, pre2)
 p <- ggplot2::ggplot(pan.t2d,ggplot2::aes(x = Pseudotime, y = cs, 
                                           color = cell.type)) + 
   ggplot2::geom_point() + ggpubr::theme_pubr() + 
@@ -502,6 +513,12 @@ saveRDS(object = pan.t2d,
 
 # Step 2: Elucidate molecular pathways that underlie the link between the trajectory and trait
 
+In this step we elucidate molecular pathways that underlie the link
+between the trajectory and trait. This is done by searching for
+biological processes, whose genes, as a set, are both linked to the
+trajectory pseudotime (**2a**) and enriched for trait-association
+signals (**2b**).
+
 ## 2a. Finding pathways enriched in the trajectory
 
 In this step we will identify gene sets that are enriched in both the
@@ -518,6 +535,14 @@ library(org.Hs.eg.db)
 library(enrichplot)
 library(dplyr)
 library(speedglm)
+```
+
+Download functions from this github directory
+[here](https://github.com/ElkonLab/scGWAS/blob/master/R/functions_scGWAS.R),
+and source:
+
+``` r
+source('functions_scGWAS.R')
 ```
 
 ### Load data
@@ -584,13 +609,6 @@ head(m_t2g,3)
 
 ### Ordering the genes according to pseudotime effect
 
-First, we match the order of the cells in the rows of the metadata, with
-that of the expression matrix.
-
-``` r
-meta <- meta[match(colnames(exp), meta$cells),]
-```
-
 To use GSEA, we first created a ranked list for the genes in the
 dataset, according to the incremental change in their expression along
 the trajectory. We estimated these incremental changes using GLM to
@@ -599,8 +617,23 @@ log-normalized gene expression values and a Gaussian error distribution
 GLM. The number of genes detected in each cell was added as a covariate
 (nGene).
 
+First, we match the order of the cells in the rows of the metadata, with
+that of the expression matrix.
+
 ``` r
-p.effect <- df.genes(exp = exp, meta = meta, model = '~Pseudotime:Branch + nGene', brach = 'beta', cors = 10)
+meta <- meta[match(colnames(exp), meta$cells),]
+```
+
+We use the function *df.genes* to fit, for each gene, the GLM model:
+
+Expression \~ Pseudotime:Branch + nGene
+
+where *Pseudotime:Branch* is the interaction between the branch and
+pseudotime, and *nGene* is the number of genes detected per cell. For
+analysis without branches, specify *branch = NULL*.
+
+``` r
+p.effect <- df.genes(exp = exp, meta = meta, model = '~Pseudotime:Branch + nGene', branch = 'beta', cors = 10)
 ```
 
 ``` r
@@ -617,7 +650,7 @@ head(p.effect, 3)
 To use GSEA from clusterProfiler, we covert gene symbols to ENTREZ IDs.
 
 ``` r
-  gene.df <- bitr(p.effect$SYMBOL, fromType = "SYMBOL" ,
+  gene.df <- clusterProfiler::bitr(p.effect$SYMBOL, fromType = "SYMBOL" ,
                   toType = c("ENTREZID"),
                   OrgDb = org.Hs.eg.db)
   p.effect <- merge(p.effect, gene.df, by = "SYMBOL")
@@ -633,7 +666,7 @@ ranking the genes.
 ```
 
 ``` r
- head(geneList, 3)
+head(geneList, 3)
 ```
 
     ##    5126    3375    7276 
@@ -650,13 +683,13 @@ We run GSEA using the ontology gene set (GO, C5, 50 &lt; set size &lt;
 500) from MSigDB.
 
 ``` r
-  edo <-  clusterProfiler::GSEA(geneList = geneList, TERM2GENE =m_t2g, maxGSSize = 500, 
+edo <-  clusterProfiler::GSEA(geneList = geneList, TERM2GENE =m_t2g, maxGSSize = 500, 
               minGSSize = 50, pvalueCutoff = 1, nPerm = 100000)
-  edo <- setReadable(x = edo, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
+edo <- clusterProfiler::setReadable(x = edo, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
 ```
 
 ``` r
- head(edo,2)
+head(edo,2)
 ```
 
     ##                                                                                                        ID
@@ -729,7 +762,7 @@ library(dplyr)
 
 From [step
 2a](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/2a.md), we
-got the beta=cells enriched gene sets.  
+got the beta-branch enriched gene sets.  
 We load it:
 
 ``` r
@@ -907,7 +940,7 @@ head(set.annot, 3)
     2 GO_HORMONE_ACTIVITY  TTR
     3 GO_HORMONE_ACTIVITY  PYY
 
-### Processing the data
+### Prioritization of genes
 
 First, we keep gene-sets significantly associated with T2D:
 
@@ -969,6 +1002,8 @@ head(risk.genes,3)
     2 10.6780 6.4236e-27
     3  8.4311 1.7116e-17
 
+### Plots
+
 We color the cells in the trajectory plot according to the expression of
 the genes as follows. We load the cell metadata from [**step
 1d**](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/1d.md).
@@ -977,7 +1012,8 @@ the genes as follows. We load the cell metadata from [**step
 meta <- readRDS("meta.pancreas.RDS")
 ```
 
-And the normalized, human ortholog converted matrix from [**step
+And the normalized, human ortholog converted expression matrix from
+[**step
 1b**](https://github.com/ElkonLab/scGWAS/blob/master/vignettes/1b.md).
 
 ``` r
